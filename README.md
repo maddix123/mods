@@ -1,174 +1,138 @@
 # AddonHub (Minecraft Add-ons Directory Clone)
 
-A modern static website inspired by **mc-addons.com**.
+A simple, modern static website inspired by platforms like **mc-addons.com**.
 
-This project is pure static (HTML/CSS), so it is very easy to host on aaPanel.
+This project is intentionally lightweight so anyone can host it without backend setup.
 
 ---
 
-## Quick local preview
+## What you get
+
+- Responsive homepage with:
+  - Hero section
+  - Featured add-on cards
+  - Category/search/sort UI elements
+  - Community/highlights panels
+- Pure HTML + CSS (single `index.html`)
+- Easy deployment to static hosts
+
+---
+
+## Quick start (run locally)
+
+1. Open a terminal in this project folder.
+2. Run a local server:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Then open: `http://localhost:8000`
-
----
-
-# aaPanel Hosting Guide (Clear Step-by-Step)
-
-If you are hosting with **aaPanel**, follow these exact steps in order.
-
-## Before you start
-
-You need:
-
-- aaPanel installed on your VPS
-- Your server public IP
-- A domain name (recommended)
-- Access to your DNS provider (Cloudflare, Namecheap, GoDaddy, etc.)
-
----
-
-## Step 1) Point domain to your server
-
-In your DNS panel, add these records:
-
-1. Root domain record
-   - Type: `A`
-   - Host/Name: `@`
-   - Value: `YOUR_SERVER_IP`
-2. Optional www record
-   - Type: `A`
-   - Host/Name: `www`
-   - Value: `YOUR_SERVER_IP`
-
-> If you use Cloudflare, start with **DNS only** (gray cloud) until SSL works.
-
-Wait a few minutes for propagation.
-
----
-
-## Step 2) Open aaPanel
-
-1. Visit your aaPanel URL, usually:
-   - `http://YOUR_SERVER_IP:7800`
-2. Log in.
-3. Install suggested packages if prompted.
-
----
-
-## Step 3) Install required app
-
-In aaPanel **App Store**, install:
-
-- **Nginx** ✅ required
-
-Optional (not required for this static site):
-
-- PHP
-- Pure-Ftpd
-
----
-
-## Step 4) Create your website in aaPanel
-
-1. Go to **Website** → **Add site**.
-2. Domain: `example.com` (replace with your real domain).
-3. Root directory: keep default or set to:
-   - `/www/wwwroot/example.com`
-4. PHP version: choose **Static**.
-5. Submit.
-
----
-
-## Step 5) Upload website files
-
-Upload `index.html` into your site root.
-
-Target path example:
+3. Open your browser at:
 
 ```text
-/www/wwwroot/example.com/index.html
+http://localhost:8000
 ```
-
-Upload options:
-
-- aaPanel File manager
-- SFTP/FTP
-- Git pull on server
 
 ---
 
-## Step 6) Confirm Nginx settings
+## Easy hosting guide (step-by-step)
 
-In **Website** list → your domain → **Settings**:
+Choose any method below.
 
-- Root path is correct (`/www/wwwroot/example.com`)
-- Index includes `index.html`
+## Option 1: GitHub Pages (free, beginner-friendly)
 
-Nginx index line should contain:
+1. Create a new GitHub repository.
+2. Upload `index.html` (and `README.md`) to the repository root.
+3. Go to **Settings → Pages**.
+4. Under **Build and deployment**:
+   - Source: **Deploy from a branch**
+   - Branch: **main**
+   - Folder: **/ (root)**
+5. Click **Save**.
+6. Wait 1–2 minutes.
+7. Open your live site URL:
+   - `https://YOUR_USERNAME.github.io/YOUR_REPO_NAME/`
+
+## Option 2: Netlify (drag-and-drop deploy)
+
+1. Go to [https://app.netlify.com/drop](https://app.netlify.com/drop).
+2. Drag your project folder (or just `index.html`) into the drop zone.
+3. Netlify instantly publishes your site.
+4. (Optional) Click **Site settings** to:
+   - Set a custom site name
+   - Connect a custom domain
+
+## Option 3: Vercel (git-based deploy)
+
+1. Push this project to GitHub/GitLab/Bitbucket.
+2. Go to [https://vercel.com/new](https://vercel.com/new).
+3. Import your repository.
+4. Framework preset: **Other** (or leave auto-detected).
+5. Build command: leave empty.
+6. Output directory: leave empty.
+7. Click **Deploy**.
+
+## Option 4: Your own VPS (Ubuntu + Nginx)
+
+1. SSH into your server.
+2. Install Nginx:
+
+```bash
+sudo apt update
+sudo apt install -y nginx
+```
+
+3. Copy your files to web root:
+
+```bash
+sudo mkdir -p /var/www/addonhub
+sudo cp index.html /var/www/addonhub/
+```
+
+4. Create Nginx site config:
+
+```bash
+sudo nano /etc/nginx/sites-available/addonhub
+```
+
+5. Paste:
 
 ```nginx
-index index.html index.htm index.php;
+server {
+    listen 80;
+    server_name YOUR_DOMAIN_OR_IP;
+
+    root /var/www/addonhub;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
 ```
 
----
+6. Enable config and reload Nginx:
 
-## Step 7) Enable SSL (HTTPS)
+```bash
+sudo ln -s /etc/nginx/sites-available/addonhub /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl reload nginx
+```
 
-1. Website **Settings** → **SSL**.
-2. Select **Let's Encrypt**.
-3. Select your domain (`example.com`, optionally `www.example.com`).
-4. Click **Apply**.
-5. Turn on **Force HTTPS**.
-
----
-
-## Step 8) Open firewall/security ports
-
-Make sure these ports are open:
-
-- `80` (HTTP)
-- `443` (HTTPS)
-- `7800` (aaPanel login panel, optional but common)
-
-You may need to open ports in:
-
-- aaPanel security settings
-- Cloud VPS firewall/security group (AWS/Lightsail/DO/etc.)
+7. Visit `http://YOUR_DOMAIN_OR_IP`.
 
 ---
 
-## Step 9) Test website
+## Customization tips
 
-Check in browser:
-
-- `http://example.com`
-- `https://example.com`
-
-If site is not loading:
-
-1. Verify DNS A record points to correct IP.
-2. Verify `index.html` exists in the root folder.
-3. Verify Nginx is running in aaPanel.
-4. Verify ports 80/443 are open.
-5. Retry after DNS propagation delay.
+- Replace placeholder add-on cards with your real content.
+- Add pages like `addons.html`, `submit.html`, and `about.html`.
+- Add analytics (Plausible/GA) if you want traffic insights.
+- Add a backend later only if you need uploads/accounts.
 
 ---
 
-## Step 10) How to update site later
-
-When you edit the site:
-
-1. Replace `/www/wwwroot/example.com/index.html`
-2. Hard refresh browser (`Ctrl + F5`)
-3. If still old, clear CDN/browser cache
-
----
-
-## Minimal file structure
+## File structure
 
 ```text
 .
@@ -180,4 +144,4 @@ When you edit the site:
 
 ## License
 
-Free for personal and commercial use.
+Use freely for personal or commercial projects.
